@@ -12,12 +12,30 @@ interface StatusBadgeProps {
   status: StatusType;
 }
 
+// Define types for analysis submissions
+interface AnalysisSubmission {
+  id: string;
+  user_id: string;
+  text: string;
+  status: StatusType;
+  result?: {
+    summary: string;
+    sentiment: 'positive' | 'negative' | 'neutral';
+    keywords: string[];
+  };
+  error_message?: string;
+  created_at: string;
+  updated_at: string;
+  completed_at?: string;
+}
+
+
 export default function Analyze() {
     const [text, setText] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [result, setResult] = useState('');
-    const [submissions, setSubmissions] = useState<any[]>([]);
+    // const [result, setResult] = useState('');
+    const [submissions, setSubmissions] = useState<AnalysisSubmission[]>([]);
     const [submissionsLoading, setSubmissionsLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -45,9 +63,9 @@ export default function Analyze() {
             setTotalItems(total);
             setTotalPages(totalPagesCount);
             setCurrentPage(page);
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Error fetching submissions:', err);
-            setError(err.message);
+            setError(err instanceof Error ? err.message : 'An error occurred');
         } finally {
             setSubmissionsLoading(false);
         }
@@ -80,7 +98,7 @@ export default function Analyze() {
         
         setLoading(true);
         setError('');
-        setResult('');
+        // setResult('');
         
         try {
             const response = await fetchWithAuth('/user/analyze', {
@@ -88,16 +106,16 @@ export default function Analyze() {
                 body: JSON.stringify({ text }),
             });
             console.log('Analysis response:', response);
-            setResult(response.data);
+            // setResult(response.data);
             
             // Refresh submissions after successful analysis
-            await getUserAnalyzeSubmissions();
+            // await getUserAnalyzeSubmissions();
             
             // Clear text after successful submission
             setText('');
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Error analyzing text:', err);
-            setError(err.message);
+            setError(err instanceof Error ? err.message : 'An error occurred');
         } finally {
             setLoading(false);
         }

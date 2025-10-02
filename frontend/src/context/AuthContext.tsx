@@ -14,10 +14,20 @@ import {
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
+// Define Firebase error type
+interface FirebaseError extends Error {
+  code: string;
+}
+
+// Type guard to check if error is a Firebase error
+function isFirebaseError(error: unknown): error is FirebaseError {
+  return error instanceof Error && 'code' in error;
+}
+
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signup: (email: string, password: string) => Promise<void>;
+  signup: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   getToken: () => Promise<string | null>;
@@ -65,19 +75,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         displayName: `${firstName} ${lastName}`,
       });
       await sendEmailVerification(userCredential.user);
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Convert Firebase error codes to user-friendly messages
-      switch (error.code) {
-        case 'auth/email-already-in-use':
-          throw new Error('An account with this email already exists.');
-        case 'auth/invalid-email':
-          throw new Error('Please enter a valid email address.');
-        case 'auth/weak-password':
-          throw new Error('Password should be at least 6 characters long.');
-        case 'auth/operation-not-allowed':
-          throw new Error('Email/password accounts are not enabled.');
-        default:
-          throw new Error(error.message || 'An error occurred during signup.');
+      if (isFirebaseError(error)) {
+        switch (error.code) {
+          case 'auth/email-already-in-use':
+            throw new Error('An account with this email already exists.');
+          case 'auth/invalid-email':
+            throw new Error('Please enter a valid email address.');
+          case 'auth/weak-password':
+            throw new Error('Password should be at least 6 characters long.');
+          case 'auth/operation-not-allowed':
+            throw new Error('Email/password accounts are not enabled.');
+          default:
+            throw new Error(error.message || 'An error occurred during signup.');
+        }
+      } else {
+        throw new Error('An unexpected error occurred during signup.');
       }
     }
   };
@@ -86,23 +100,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await setPersistence(auth, browserLocalPersistence);
       await signInWithEmailAndPassword(auth, email, password);
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Convert Firebase error codes to user-friendly messages
-      switch (error.code) {
-        case 'auth/user-not-found':
-          throw new Error('No account found with this email address.');
-        case 'auth/wrong-password':
-          throw new Error('Incorrect password. Please try again.');
-        case 'auth/invalid-email':
-          throw new Error('Please enter a valid email address.');
-        case 'auth/user-disabled':
-          throw new Error('This account has been disabled.');
-        case 'auth/too-many-requests':
-          throw new Error('Too many failed attempts. Please try again later.');
-        case 'auth/network-request-failed':
-          throw new Error('Network error. Please check your connection.');
-        default:
-          throw new Error(error.message || 'An error occurred during login.');
+      if (isFirebaseError(error)) {
+        switch (error.code) {
+          case 'auth/user-not-found':
+            throw new Error('No account found with this email address.');
+          case 'auth/wrong-password':
+            throw new Error('Incorrect password. Please try again.');
+          case 'auth/invalid-email':
+            throw new Error('Please enter a valid email address.');
+          case 'auth/user-disabled':
+            throw new Error('This account has been disabled.');
+          case 'auth/too-many-requests':
+            throw new Error('Too many failed attempts. Please try again later.');
+          case 'auth/network-request-failed':
+            throw new Error('Network error. Please check your connection.');
+          default:
+            throw new Error(error.message || 'An error occurred during login.');
+        }
+      } else {
+        throw new Error('An unexpected error occurred during login.');
       }
     }
   };

@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "kai-developer-test"
+  },
+  "targets": {
+    "kai-developer-test": {
+      "hosting": {
+        "frontend": [
+          "kai-text-analyzer"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
