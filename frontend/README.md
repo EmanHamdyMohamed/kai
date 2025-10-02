@@ -80,31 +80,6 @@ bun build
 bun start
 ```
 
-## 📱 Application Structure
-
-### Pages
-
-- **`/`** - Landing page with authentication options
-- **`/auth/login`** - User login page
-- **`/auth/register`** - User registration page
-- **`/analyze`** - Text analysis dashboard (protected)
-
-### Components
-
-- **`Header`** - Navigation header with authentication state
-- **`HeaderTitle`** - Page title component
-- **`UserInfo`** - User profile information display
-- **`ErrorMessage`** - Error message display component
-
-### Context
-
-- **`AuthContext`** - Firebase authentication state management
-
-### Libraries
-
-- **`firebase.ts`** - Firebase configuration and initialization
-- **`api.ts`** - Backend API communication with authentication
-
 ## 🔧 Development
 
 ### Available Scripts
@@ -255,18 +230,7 @@ This project is configured for Firebase Hosting deployment with static export.
 
 #### Environment Variables for Production
 
-Set environment variables in Firebase Hosting:
-
-```bash
-# Set environment variables
-firebase functions:config:set app.api_url="https://your-backend-api.com/v1"
-firebase functions:config:set app.firebase_api_key="your-firebase-api-key"
-```
-
-Or configure in Firebase Console:
-1. Go to Firebase Console → Project Settings
-2. Navigate to "General" tab
-3. Add environment variables in "Your apps" section
+Environment variables are configured in `.env.local` file for local development and should be set in your hosting platform's environment configuration for production deployment.
 
 #### Custom Domain (Optional)
 
