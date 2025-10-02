@@ -5,6 +5,7 @@ from .firebase import initialize_firebase
 from .routes.v1_routes import v1_router
 from .utils.responses import success_response
 from .middleware.auth import authorize_token
+from .middleware.log_request_metadata import log_request_metadata
 
 app = FastAPI(
     title="Kai Backend API",
@@ -49,5 +50,7 @@ def health_check():
         status_code=200
     )
 
+
 app.middleware("http")(authorize_token)
+app.middleware("http")(log_request_metadata)
 app.include_router(v1_router)
