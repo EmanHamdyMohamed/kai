@@ -29,7 +29,6 @@ export default function Analyze() {
     // on page load get list of user analyze submissions with pagination 10 items per page
     const getUserAnalyzeSubmissions = async (page: number = currentPage) => {
         try {
-            debugger;
             setSubmissionsLoading(true);
             const offset = (page - 1) * itemsPerPage;
             const response = await fetchWithAuth(`/user/analyze?offset=${offset}&limit=${itemsPerPage}`, {
@@ -197,9 +196,23 @@ export default function Analyze() {
                                 <div key={submission.id || index} className="rounded-lg border border-gray-200 bg-card text-card-foreground shadow-sm shadow-lg p-6">
                                     <div className="flex items-start justify-between gap-4 p-3 pt-0">
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-sm text-muted-foreground truncate mb-2">
+                                            <p className="text-sm text-muted-foreground mb-2 font-bold">
                                                 {submission.text}
                                             </p>
+                                            {
+                                                submission.result && (
+                                                    <div className="flex flex-col gap-2">
+                                                        <p className="text-sm text-muted-foreground mb-2">
+                                                            <span className="font-bold">Sentiment:</span> {submission.result?.sentiment || 'N/A'}
+                                                        </p><p className="text-sm text-muted-foreground mb-2">
+                                                            <span className="font-bold">Summary:</span> {submission.result?.summary || 'N/A'}
+                                                        </p><p className="text-sm text-muted-foreground mb-2">
+                                                            <span className="font-bold">Keywords:</span> {(submission.result?.keywords || []).join(', ') || 'N/A'}
+                                                        </p>
+                                                    </div>
+                                                )
+                                            }
+
                                             {submission.status === 'failed' && (
                                                 <p className="text-sm text-red-500 mb-2">
                                                     {submission.error_message}

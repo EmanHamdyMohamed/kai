@@ -44,7 +44,6 @@ export default function Register() {
 
     try {
       await signup(email, password, firstName, lastName);
-      alert('Signup successful! Please check your email for verification.');
       router.push('/auth/login');
     } catch (err: any) {
       setError(err.message);
