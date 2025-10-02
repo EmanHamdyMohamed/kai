@@ -202,7 +202,80 @@ The frontend communicates with the backend API through:
 
 ## 🚀 Deployment
 
-### Vercel (Recommended)
+### Firebase Hosting (Recommended)
+
+This project is configured for Firebase Hosting deployment with static export.
+
+#### Prerequisites
+
+1. **Install Firebase CLI**
+   ```bash
+   npm install -g firebase-tools
+   ```
+
+2. **Login to Firebase**
+   ```bash
+   firebase login
+   ```
+
+3. **Initialize Firebase (if not already done)**
+   ```bash
+   firebase init hosting
+   ```
+
+#### Deployment Steps
+
+1. **Build the application for static export**
+   ```bash
+   npm run build
+   ```
+
+2. **Deploy to Firebase Hosting**
+   ```bash
+   firebase deploy --only hosting
+   ```
+
+3. **Deploy to specific project and site**
+   ```bash
+   # Select the project
+   firebase use kai-developer-test
+   
+   # Deploy directly to the specific site
+   firebase deploy --only hosting:kai-text-analyzer
+   ```
+
+4. **Add alias for easier deployment (optional)**
+   ```bash
+   # Add an alias for the hosting site
+   firebase target:apply hosting frontend kai-text-analyzer
+   
+   # Now you can use the alias for future deployments
+   firebase deploy --only hosting:frontend
+   ```
+
+#### Environment Variables for Production
+
+Set environment variables in Firebase Hosting:
+
+```bash
+# Set environment variables
+firebase functions:config:set app.api_url="https://your-backend-api.com/v1"
+firebase functions:config:set app.firebase_api_key="your-firebase-api-key"
+```
+
+Or configure in Firebase Console:
+1. Go to Firebase Console → Project Settings
+2. Navigate to "General" tab
+3. Add environment variables in "Your apps" section
+
+#### Custom Domain (Optional)
+
+1. **Add custom domain in Firebase Console**
+   - Go to Firebase Console → Hosting
+   - Click "Add custom domain"
+   - Follow the verification steps
+
+### Vercel (Alternative)
 
 1. **Connect your repository to Vercel**
 2. **Set environment variables** in Vercel dashboard
@@ -216,15 +289,6 @@ The application can be deployed to any platform that supports Next.js:
 - **AWS Amplify**: Full-stack deployment
 - **Railway**: Simple deployment
 - **Docker**: Containerized deployment
-
-### Environment Variables for Production
-
-Ensure all required environment variables are set:
-
-- Firebase configuration variables
-- API URL for backend communication
-- Any additional production-specific variables
-
 
 ## 🤝 Contributing
 
