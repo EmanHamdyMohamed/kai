@@ -4,7 +4,7 @@ import Header from "@/app/components/Header";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-blue-50">
+    <div className="h-full bg-blue-50">
       <Header 
         buttons={[
           { text: "Sign in", href: "/auth/login", variant: "primary" },

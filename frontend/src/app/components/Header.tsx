@@ -1,5 +1,6 @@
 import Link from "next/link";
 import HeaderTitle from "./HeaderTitle";
+import UserInfo from "./UserInfo";
 
 interface HeaderProps {
     buttons?: Array<{
@@ -8,14 +9,17 @@ interface HeaderProps {
       variant?: 'primary' | 'secondary';
       onClick?: () => void;
     }>;
+    userInfo?: boolean;
 }
 
-export default function Header({ buttons }: HeaderProps) {
+export default function Header({ buttons, userInfo }: HeaderProps) {
     return (
         <header className="bg-white">
             <div className="container mx-auto px-4 py-4 flex items-center justify-between">
                 <HeaderTitle ></HeaderTitle>
-                <div className="flex gap-2">
+                <div className="flex items-center gap-4">
+                    {userInfo && <UserInfo />}
+                    <div className="flex gap-2">
                     {
                         buttons?.map((button, index) => (
                             <Link
@@ -32,6 +36,7 @@ export default function Header({ buttons }: HeaderProps) {
                             </Link>
                         ))
                     }
+                    </div>
                 </div>
             </div>
       </header>
