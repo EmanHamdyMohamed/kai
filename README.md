@@ -111,6 +111,43 @@ For support and questions:
 - Review the API documentation
 - Check the Firebase and OpenAI documentation
 
+## ⏱️ Development Timeline & Approach
+
+### 📊 Overall Project Duration
+**Total Development Time: ~16 hours**
+
+### 🚀 Development Breakdown
+
+- **Day 1**: Project setup, architecture planning, Research
+  - Setup frontend
+  - Build UI components and design
+  - Implemented sign-in/sign-up using firebase
+  - FastAPI application structure
+  - Firebase and firestore database integration
+- **Day 2**: Backend API development
+  - Firebase authentication middleware
+  - Implemented analyze endpoints
+  - OpenAI text analysis service
+  - Integrate frontend with backend analyze apis
+  - Deploy frontend to firebase host
+  - Deploy backend to GCP
+- **Day 3**
+  - Implemented some adjustments and fixes
+  - Update readme files
+
+### 🤖 AI Assistant Usage
+
+#### **Primary AI Assistant: Claude**
+  - **Code Generation**: Code out-complete and Implementation based on prompt description
+  - **Problem Solving**: Complex integration challenges and debugging
+  - **Documentation**: README files, API documentation, and code comments
+  - **OpenAI Integration**: API wrapper functions and error handling
+  - **Styling**: Tailwind CSS classes and responsive design
+  - **Troubleshooting**: Common issues and solutions and search in documentations
+  - **Frontend design**: I used lovable to provide app design and style
+
+---
+
 ## 🔄 Changelog
 
 ### v1.0.0
