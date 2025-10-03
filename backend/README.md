@@ -91,7 +91,7 @@ make docker-compose-up
 2. Go to **Cloud Run** in the GCP Console
 3. Click **"Deploy Container"**
 4. Select **"Continuously deploy from a repository (source or function)"**
-5. Choose your repository (GitHub/GitLab)
+5. Choose your repository GitHub
 6. Select the **backend** folder as the source directory
 7. Configure settings
 
@@ -220,13 +220,3 @@ For support and questions:
 - Create an issue in the repository
 - Check the API documentation at `/docs`
 - Review the test cases for usage examples
-
-## 🔄 Changelog
-
-### v1.0.0
-- Initial release
-- Firebase authentication integration
-- Text analysis with OpenAI
-- Background task processing
-- Comprehensive test suite
-- API documentation
