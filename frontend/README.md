@@ -134,7 +134,6 @@ The application uses Firebase Authentication with the following features:
 
 - **Email/Password Authentication**: Secure user registration and login
 - **Persistent Sessions**: Users stay logged in across browser sessions
-- **Email Verification**: Optional email verification for new accounts
 - **Protected Routes**: Authentication required for analysis features
 - **JWT Tokens**: Automatic token management for API requests
 
@@ -197,9 +196,6 @@ This project is configured for Firebase Hosting deployment with static export.
 
 3. **Deploy to specific project and site**
    ```bash
-   # Select the project
-   firebase use kai-developer-test
-
    # Create new site if not already exist
    firebase hosting:sites:create kai-text-analyzer
 
@@ -223,8 +219,6 @@ Environment variables are configured in `.env.local` file for local development 
 ## 📝 TODO / Frontend Roadmap
 
 - [ ] **Testing**: Comprehensive test suite (unit, integration, E2E)
-- [ ] **Dark Mode**: Add dark theme support
-- [ ] **Error Handling**: Need better error boundaries
 - [ ] **Automatic Deploy**: Add github workflow to automate deployment process
 - [ ] **Centralize env variables**: Add environment variables to GCP secret manager
 

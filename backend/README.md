@@ -10,7 +10,6 @@ A FastAPI-based backend service for the Kai application, providing text analysis
 - **Firestore Database**: Async Firestore client for data persistence
 - **Background Tasks**: Asynchronous text processing with status tracking
 - **CORS Support**: Configured for frontend integration
-- **Comprehensive Testing**: Full test suite with mocking and fixtures
 - **Code Quality**: Pre-commit hooks with Ruff linting and formatting
 
 ## 📋 Prerequisites
@@ -88,21 +87,13 @@ make docker-compose-up
 
 ### Deploy to Google Cloud Run
 
-#### 1. **Enable Required APIs**
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Navigate to **APIs & Services** > **Library**
-3. Enable the following APIs:
-   - **Cloud Run API**
-   - **Cloud Build API**
-   - **Container Registry API**
-
-#### 2. **Deploy from Repository**
-1. Go to **Cloud Run** in the GCP Console
-2. Click **"Create Service"**
-3. Select **"Deploy from source repository"**
-4. Choose your repository (GitHub/GitLab)
-5. Select the **backend** folder as the source directory
-6. Configure settings:
+2. Go to **Cloud Run** in the GCP Console
+3. Click **"Deploy Container"**
+4. Select **"Continuously deploy from a repository (source or function)"**
+5. Choose your repository (GitHub/GitLab)
+6. Select the **backend** folder as the source directory
+7. Configure settings
 
 
 **Container Configuration:**
@@ -165,9 +156,6 @@ All protected endpoints require a Firebase JWT token in the Authorization header
 ```http
 Authorization: Bearer <firebase-jwt-token>
 ```
-
-## 🧪 Testing
-to be added
 
 ### Project Structure
 
