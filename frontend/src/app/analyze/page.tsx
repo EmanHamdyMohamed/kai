@@ -34,6 +34,7 @@ export default function Analyze() {
     const [text, setText] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
     const [submissions, setSubmissions] = useState<AnalysisSubmission[]>([]);
     const [submissionsLoading, setSubmissionsLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
@@ -45,19 +46,19 @@ export default function Analyze() {
 
     const validateText = useCallback((text: string) => {
         const errors: string[] = [];
-        
+
         if (!text.trim()) {
           errors.push('Text is required');
         }
-        
+
         if (text.length > 10000) {
           errors.push('Text must be less than 10,000 characters');
         }
-        
+
         if (text.length < 3) {
           errors.push('Text must be at least 10 characters');
         }
-        
+
         return errors;
     }, []);
 
@@ -70,12 +71,12 @@ export default function Analyze() {
                 method: 'GET',
             });
             console.log('Submissions response:', response);
-            
+
             // Extract pagination metadata from response
             const requests = response.data.requests || [];
             const total = response.data.total || requests.length;
             const totalPagesCount = Math.ceil(total / itemsPerPage);
-            
+
             setSubmissions(requests);
             setTotalItems(total);
             setTotalPages(totalPagesCount);
@@ -89,19 +90,19 @@ export default function Analyze() {
     }, [currentPage, itemsPerPage]);
     useEffect(() => {
         console.log('Analyze page useEffect - authLoading:', authLoading, 'user:', user);
-        
+
         // Wait for auth to finish loading before checking user
         if (authLoading) {
             console.log('Still loading auth, waiting...');
             return;
         }
-        
+
         if (!user || !isTokenValid) {
             console.log('No user found, redirecting to login');
             router.push('/auth/login');
             return;
         }
-        
+
         console.log('User found, loading submissions');
         getUserAnalyzeSubmissions();
     }, [user, authLoading, isTokenValid, getUserAnalyzeSubmissions, router]);
@@ -111,27 +112,39 @@ export default function Analyze() {
         const errors = validateText(text);
         if (errors.length > 0) {
             setError(errors.join(', '));
+            setSuccess(''); // Clear success message if there are errors
             return;
         }
-        
+
         setLoading(true);
         setError('');
-        
+        setSuccess(''); // Clear previous success message
+
         try {
             const response = await fetchWithAuth('/user/analyze', {
                 method: 'POST',
                 body: JSON.stringify({ text }),
             });
             console.log('Analysis response:', response);
-            
+
+            // Show success message
+            setSuccess('Text submitted successfully! Your analysis is being processed and will appear in the list below shortly.');
+
             // Refresh submissions after successful analysis
             // await getUserAnalyzeSubmissions();
-            
+
             // Clear text after successful submission
             setText('');
+
+            // Auto-hide success message after 5 seconds
+            setTimeout(() => {
+                setSuccess('');
+            }, 5000);
+
         } catch (err: unknown) {
             console.error('Error analyzing text:', err);
             setError(err instanceof Error ? err.message : 'An error occurred');
+            setSuccess(''); // Clear success message on error
         } finally {
             setLoading(false);
         }
@@ -143,9 +156,9 @@ export default function Analyze() {
           pending: { bg: 'bg-gray-100', text: 'text-gray-800', dot: 'bg-gray-400', label: 'Pending' },
           failed: { bg: 'bg-red-100', text: 'text-red-800', dot: 'bg-red-400', label: 'Failed' }
         };
-        
+
         const config = statusConfig[status] || statusConfig.pending;
-        
+
         return (
           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.bg} ${config.text}`}>
             <div className={`w-1.5 h-1.5 ${config.dot} rounded-full mr-1.5 ${config.animate ? 'animate-pulse' : ''}`}></div>
@@ -184,15 +197,26 @@ export default function Analyze() {
                                 required
                                 disabled={loading}
                             />
-                            
+
                             {error && (
                                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
                                     <p className="text-sm font-medium">{error}</p>
                                 </div>
                             )}
-                            
-                            <button 
-                                type="submit" 
+
+                            {success && (
+                                <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md">
+                                    <div className="flex items-center">
+                                        <svg className="w-5 h-5 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                        </svg>
+                                        <p className="text-sm font-medium">{success}</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            <button
+                                type="submit"
                                 disabled={loading || !text.trim()}
                                 className="w-full bg-blue-400 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                             >
@@ -279,7 +303,7 @@ export default function Analyze() {
                                 >
                                     Previous
                                 </button>
-                                
+
                                 <div className="flex items-center space-x-1">
                                     {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                                         let pageNum;
@@ -292,7 +316,7 @@ export default function Analyze() {
                                         } else {
                                             pageNum = currentPage - 2 + i;
                                         }
-                                        
+
                                         return (
                                             <button
                                                 key={pageNum}
@@ -309,7 +333,7 @@ export default function Analyze() {
                                         );
                                     })}
                                 </div>
-                                
+
                                 <button
                                     onClick={() => getUserAnalyzeSubmissions(currentPage + 1)}
                                     disabled={currentPage === totalPages || submissionsLoading}
@@ -324,4 +348,4 @@ export default function Analyze() {
             </div>
         </div>
     </div>;
-}   
+}
