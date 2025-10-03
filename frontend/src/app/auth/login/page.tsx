@@ -5,6 +5,7 @@ import ErrorMessage from "@/app/components/ErrorMessage";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -82,6 +83,19 @@ export default function Login() {
                     </button>
 
                 </form>
+
+                {/* Signup redirect section */}
+                <div className="mt-6 text-center">
+                    <p className="text-sm text-gray-600">
+                        Don&apos;t have an account?{' '}
+                        <Link 
+                            href="/auth/register" 
+                            className="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200"
+                        >
+                            Sign up here
+                        </Link>
+                    </p>
+                </div>
             </div>
 
             

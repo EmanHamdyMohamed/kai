@@ -10,7 +10,7 @@ import {
   sendEmailVerification,
   updateProfile,
   browserLocalPersistence,
-  setPersistence
+  setPersistence,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
@@ -27,10 +27,12 @@ function isFirebaseError(error: unknown): error is FirebaseError {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  isTokenValid: boolean;
   signup: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   getToken: () => Promise<string | null>;
+  validateToken: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -42,6 +44,7 @@ export function useAuth() {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isTokenValid, setIsTokenValid] = useState(false);
 
   useEffect(() => {
     // Set persistence first, then listen to auth state changes
@@ -57,13 +60,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     initializeAuth();
 
-    // Listen to auth state changes
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      console.log('Auth state changed:', user ? `User logged in: ${user.email}` : 'User logged out');
-      console.log('User object:', user);
-      setUser(user);
-      setLoading(false);
-    });
+  // Listen to auth state changes
+  const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      // Validate token when user is set
+      const isValid = await validateTokenWithUser(user);
+      if (isValid) {
+        setUser(user);
+        setIsTokenValid(true);
+      } else {
+        // Token is invalid, clear persistence and logout
+        console.log('Token invalid, clearing persistence and logging out');
+        await signOut(auth);
+        setUser(null);
+        setIsTokenValid(false);
+      }
+    } else {
+      setUser(null);
+      setIsTokenValid(false);
+    }
+    
+    setLoading(false);
+  });
 
     return unsubscribe;
   }, []);
@@ -129,6 +147,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await signOut(auth);
   };
 
+  // Helper function to validate token with a specific user
+  const validateTokenWithUser = async (user: User): Promise<boolean> => {
+    try {
+      // For frontend, we rely on Firebase's built-in token management
+      // Firebase automatically handles token refresh and validation
+      if (!user) return false;
+      
+      // Get fresh token - Firebase automatically handles refresh if needed
+      const token = await user.getIdToken(false); // false = don't force refresh
+      return token !== null;
+    } catch (error) {
+      console.error('Token validation error:', error);
+      return false;
+    }
+  };
+
   const getToken = async () => {
     if (user) {
       return await user.getIdToken();
@@ -136,13 +170,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return null;
   };
 
+  const validateToken = async (): Promise<boolean> => {
+    if (!user) {
+      setIsTokenValid(false);
+      return false;
+    }
+    
+    const isValid = await validateTokenWithUser(user);
+    if (isValid) {
+      setIsTokenValid(true);
+      return true;
+    } else {
+      // Token is invalid, clear persistence and logout
+      console.log('Token validation failed, clearing persistence and logging out');
+      await signOut(auth);
+      setUser(null);
+      setIsTokenValid(false);
+      return false;
+    }
+  };
+
   const value = {
     user,
     loading,
+    isTokenValid,
     signup,
     login,
     logout,
     getToken,
+    validateToken,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

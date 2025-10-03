@@ -4,7 +4,7 @@ import Header from "@/app/components/Header";
 import { useAuth } from "@/context/AuthContext";
 import { fetchWithAuth } from "@/lib/api";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 type StatusType = 'completed' | 'processing' | 'pending' | 'failed';
 
@@ -34,7 +34,6 @@ export default function Analyze() {
     const [text, setText] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    // const [result, setResult] = useState('');
     const [submissions, setSubmissions] = useState<AnalysisSubmission[]>([]);
     const [submissionsLoading, setSubmissionsLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
@@ -42,10 +41,28 @@ export default function Analyze() {
     const [totalItems, setTotalItems] = useState(0);
     const itemsPerPage = 10;
     const router = useRouter();
-    const { user, loading: authLoading } = useAuth();
+    const { user, loading: authLoading, isTokenValid } = useAuth();
+
+    const validateText = useCallback((text: string) => {
+        const errors: string[] = [];
+        
+        if (!text.trim()) {
+          errors.push('Text is required');
+        }
+        
+        if (text.length > 10000) {
+          errors.push('Text must be less than 10,000 characters');
+        }
+        
+        if (text.length < 3) {
+          errors.push('Text must be at least 10 characters');
+        }
+        
+        return errors;
+    }, []);
 
     // on page load get list of user analyze submissions with pagination 10 items per page
-    const getUserAnalyzeSubmissions = async (page: number = currentPage) => {
+    const getUserAnalyzeSubmissions = useCallback(async (page: number = currentPage) => {
         try {
             setSubmissionsLoading(true);
             const offset = (page - 1) * itemsPerPage;
@@ -69,7 +86,7 @@ export default function Analyze() {
         } finally {
             setSubmissionsLoading(false);
         }
-    }
+    }, [currentPage, itemsPerPage]);
     useEffect(() => {
         console.log('Analyze page useEffect - authLoading:', authLoading, 'user:', user);
         
@@ -79,7 +96,7 @@ export default function Analyze() {
             return;
         }
         
-        if (!user) {
+        if (!user || !isTokenValid) {
             console.log('No user found, redirecting to login');
             router.push('/auth/login');
             return;
@@ -87,18 +104,18 @@ export default function Analyze() {
         
         console.log('User found, loading submissions');
         getUserAnalyzeSubmissions();
-    }, [user, authLoading]);
+    }, [user, authLoading, isTokenValid, getUserAnalyzeSubmissions, router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!text.trim()) {
-            setError('Please enter some text to analyze');
+        const errors = validateText(text);
+        if (errors.length > 0) {
+            setError(errors.join(', '));
             return;
         }
         
         setLoading(true);
         setError('');
-        // setResult('');
         
         try {
             const response = await fetchWithAuth('/user/analyze', {
@@ -106,7 +123,6 @@ export default function Analyze() {
                 body: JSON.stringify({ text }),
             });
             console.log('Analysis response:', response);
-            // setResult(response.data);
             
             // Refresh submissions after successful analysis
             // await getUserAnalyzeSubmissions();

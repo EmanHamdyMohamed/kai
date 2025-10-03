@@ -158,11 +158,16 @@ export default function Register() {
           
             </form>
 
-            <div className="mt-4 text-center text-sm text-muted-foreground">
-              Already have an account?{" "}
-              <Link href="/auth/login" className="text-primary hover:underline">
-                Sign in
-              </Link>
+            <div className="mt-6 text-center">
+              <p className="text-sm text-gray-600">
+                Already have an account?{' '}
+                <Link 
+                  href="/auth/login" 
+                  className="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200"
+                >
+                  Sign in here
+                </Link>
+              </p>
             </div>
           
           </div>

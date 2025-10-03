@@ -1,6 +1,11 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import HeaderTitle from "./HeaderTitle";
 import UserInfo from "./UserInfo";
+import { useEffect } from "react";
 
 interface HeaderProps {
     buttons?: Array<{
@@ -10,9 +15,41 @@ interface HeaderProps {
       onClick?: () => void;
     }>;
     userInfo?: boolean;
+    enableAuthRedirect?: boolean; // New prop to enable auth-based redirect
 }
 
-export default function Header({ buttons, userInfo }: HeaderProps) {
+export default function Header({ buttons, userInfo, enableAuthRedirect = false }: HeaderProps) {
+    const { user, loading, isTokenValid } = useAuth();
+    const router = useRouter();
+
+    // Handle authentication-based redirect
+    useEffect(() => {
+        if (enableAuthRedirect && !loading) {
+            if (user && isTokenValid) {
+                // User is authenticated and token is valid, redirect to analyze page
+                router.push('/analyze');
+            } else {
+                // User is not authenticated or token is invalid, redirect to login page
+                router.push('/auth/login');
+            }
+        }
+    }, [user, loading, isTokenValid, enableAuthRedirect, router]);
+
+    // Show loading state while checking authentication
+    if (enableAuthRedirect && loading) {
+        return (
+            <header className="bg-white">
+                <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+                    <HeaderTitle />
+                    <div className="flex items-center gap-4">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                        <span className="text-sm text-gray-600">Loading...</span>
+                    </div>
+                </div>
+            </header>
+        );
+    }
+
     return (
         <header className="bg-white">
             <div className="container mx-auto px-4 py-4 flex items-center justify-between">
