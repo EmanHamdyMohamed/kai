@@ -68,7 +68,7 @@ The API will be available at:
 ### Production Mode
 
 ```bash
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
+uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
 ### Docker
@@ -82,7 +82,7 @@ make docker-compose-up
 ### Prerequisites
 
 - **Google Cloud Account** with billing enabled
-- **GitHub/GitLab Repository** with your code
+- **GitHub Repository** with your code
 - **Firebase Project** configured
 - **OpenAI API Key** available
 
@@ -102,16 +102,8 @@ make docker-compose-up
 3. Select **"Deploy from source repository"**
 4. Choose your repository (GitHub/GitLab)
 5. Select the **backend** folder as the source directory
-6. Configure the following settings:
+6. Configure settings:
 
-**Service Configuration:**
-- **Service name**: `kai-backend`
-- **Region**: `us-central1` (or your preferred region)
-- **CPU allocation**: `CPU is only allocated during request processing`
-- **Memory**: `1 GiB`
-- **CPU**: `1`
-- **Maximum instances**: `10`
-- **Minimum instances**: `0`
 
 **Container Configuration:**
 - **Port**: `8000`
@@ -124,30 +116,29 @@ In the **Variables & Secrets** tab, add environment variables from .env file:
 #### 4. **Deploy the Service**
 1. Click **"Create"** to deploy your service
 2. Wait for the deployment to complete (usually 2-5 minutes)
-3. Note the service URL (e.g., `https://kai-backend-xxxxx-uc.a.run.app`)
 
 ### Post-Deployment Verification
 
 #### 1. **Test Health Endpoints**
 ```bash
 # Test the health endpoint
-curl https://kai-backend-xxxxx-uc.a.run.app/health
+curl https://xxxxx/health
 
 # Test the root endpoint
-curl https://kai-backend-xxxxx-uc.a.run.app/
+curl https://xxxxx/
 ```
 
 #### 2. **Test API Documentation**
 Visit your deployed API documentation:
 ```
-https://kai-backend-xxxxx-uc.a.run.app/docs
+https://xxxxx/docs
 ```
 
 #### 3. **Test Authentication Endpoint**
 ```bash
 # Test user profile endpoint (requires authentication)
 curl -H "Authorization: Bearer YOUR_FIREBASE_JWT_TOKEN" \
-     https://kai-backend-xxxxx-uc.a.run.app/v1/user/me
+     https://xxxxx/v1/user/me
 ```
 
 ## 📚 API Documentation
@@ -211,6 +202,14 @@ backend/
 ├── docker-compose.yml        # Docker Compose configuration
 └── README.md                 # This file
 ```
+
+## 📝 TODO
+- [ ] **Rate Limiting**: Implement basic rate limiting middleware
+- [ ] **Health Checks**: Enhanced health check endpoints
+- [ ] **Testing**: Comprehensive test suite (unit, integration, E2E)
+- [ ] **CI/CD**: Automated testing and deployment pipeline
+- [ ] **Message Queues**: Redis/RabbitMQ/SQS for task processing
+
 
 ## 🤝 Contributing
 

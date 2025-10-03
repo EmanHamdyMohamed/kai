@@ -15,7 +15,7 @@ A modern Next.js frontend application for the Kai text analysis platform, featur
 
 ## 📋 Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm, yarn, pnpm, or bun
 - Firebase project with Authentication enabled
 - Backend API running (see backend README)
@@ -40,7 +40,10 @@ A modern Next.js frontend application for the Kai text analysis platform, featur
    ```
 
 3. **Configure environment variables**
-   Create a `.env.local` file in the frontend directory:
+    ```bash
+   cp .env.template .env.local
+   ```
+   Then edit the `.env.local` file with your actual values.
 
 4. **Set up Firebase**
    - Create a Firebase project at [Firebase Console](https://console.firebase.google.com)
@@ -90,13 +93,6 @@ npm run build        # Build for production
 npm run start        # Start production server
 npm run lint         # Run ESLint
 ```
-
-### Code Quality
-
-The project uses:
-- **ESLint**: Code linting and style enforcement
-- **TypeScript**: Type checking and safety
-- **Tailwind CSS**: Utility-first styling
 
 ### Project Structure
 
@@ -150,16 +146,6 @@ The application uses Firebase Authentication with the following features:
 4. All API requests include Firebase JWT token
 5. User can logout to return to public pages
 
-## 🎨 Styling
-
-The application uses Tailwind CSS for styling with:
-
-- **Utility-first approach**: Rapid UI development
-- **Responsive design**: Mobile-first responsive breakpoints
-- **Custom components**: Reusable styled components
-- **Consistent spacing**: Standardized spacing and typography
-- **Modern design**: Clean, professional appearance
-
 ## 🔌 API Integration
 
 The frontend communicates with the backend API through:
@@ -171,13 +157,12 @@ The frontend communicates with the backend API through:
 
 ### API Endpoints Used
 
-- `GET /v1/user/me` - Get user profile
 - `POST /v1/user/analyze` - Submit text for analysis
 - `GET /v1/user/analyze` - Get analysis results
 
 ## 🚀 Deployment
 
-### Firebase Hosting (Recommended)
+### Firebase Hosting
 
 This project is configured for Firebase Hosting deployment with static export.
 
@@ -214,7 +199,10 @@ This project is configured for Firebase Hosting deployment with static export.
    ```bash
    # Select the project
    firebase use kai-developer-test
-   
+
+   # Create new site if not already exist
+   firebase hosting:sites:create kai-text-analyzer
+
    # Deploy directly to the specific site
    firebase deploy --only hosting:kai-text-analyzer
    ```
@@ -223,7 +211,7 @@ This project is configured for Firebase Hosting deployment with static export.
    ```bash
    # Add an alias for the hosting site
    firebase target:apply hosting frontend kai-text-analyzer
-   
+
    # Now you can use the alias for future deployments
    firebase deploy --only hosting:frontend
    ```
@@ -232,27 +220,14 @@ This project is configured for Firebase Hosting deployment with static export.
 
 Environment variables are configured in `.env.local` file for local development and should be set in your hosting platform's environment configuration for production deployment.
 
-#### Custom Domain (Optional)
+## 📝 TODO / Frontend Roadmap
 
-1. **Add custom domain in Firebase Console**
-   - Go to Firebase Console → Hosting
-   - Click "Add custom domain"
-   - Follow the verification steps
+- [ ] **Testing**: Comprehensive test suite (unit, integration, E2E)
+- [ ] **Dark Mode**: Add dark theme support
+- [ ] **Error Handling**: Need better error boundaries
+- [ ] **Automatic Deploy**: Add github workflow to automate deployment process
+- [ ] **Centralize env variables**: Add environment variables to GCP secret manager
 
-### Vercel (Alternative)
-
-1. **Connect your repository to Vercel**
-2. **Set environment variables** in Vercel dashboard
-3. **Deploy automatically** on every push to main branch
-
-### Other Platforms
-
-The application can be deployed to any platform that supports Next.js:
-
-- **Netlify**: Static site generation
-- **AWS Amplify**: Full-stack deployment
-- **Railway**: Simple deployment
-- **Docker**: Containerized deployment
 
 ## 🤝 Contributing
 
@@ -275,12 +250,3 @@ For support and questions:
 - Check the Next.js documentation
 - Review the Firebase documentation
 - Check the backend API documentation
-
-## 🔄 Changelog
-
-### v0.1.0
-- Initial release
-- Firebase authentication integration
-- Text analysis dashboard
-- Responsive design
-- TypeScript support
