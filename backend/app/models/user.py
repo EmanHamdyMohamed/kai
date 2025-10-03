@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from enum import Enum
 from typing import Optional
 from datetime import datetime
@@ -13,7 +13,15 @@ class UserProfile(BaseModel):
 class AnalyzeBody(BaseModel):
     """Request body for text analysis."""
 
-    text: str = Field(..., min_length=1, max_length=10000, description="Text to analyze")
+    text: str = Field(min_length=1, max_length=10000, description="Text to analyze")
+
+    @validator('text')
+    def validate_text(cls, v):
+        if not v.strip():
+            raise ValueError('Text cannot be empty')
+        if len(v.strip()) < 3:
+            raise ValueError('Text too short for meaningful analysis')
+        return v.strip()
 
 
 class RequestStatus(Enum):

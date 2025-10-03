@@ -29,17 +29,13 @@ async def authorize_token(request: Request, call_next):
 
     try:
         decoded_token = auth.verify_id_token(token)
-        # print("Decoded token:", decoded_token)
-        
         # Add user info to request state (use request.state, not request.user)
-        print(decoded_token)
         request.state.user = {
             "user_id": decoded_token['uid'],  # Firebase uses 'uid', not 'user_id'
             "name": decoded_token['name'],
             "email": decoded_token['email'],
             "email_verified": decoded_token.get('email_verified', False)
         }
-        
         return await call_next(request)
         
     except auth.InvalidIdTokenError:

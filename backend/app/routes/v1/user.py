@@ -9,6 +9,7 @@ from app.models.response import SuccessResponse
 from app.models.user import AnalyzeBody, RequestStatus
 from app.services.analyze_text import request_text_analyze
 from app.utils.responses import handle_exception, success_response
+from app.utils.run_functions_concurrently import run_functions_concurrently
 
 
 router = APIRouter(prefix="/user", tags=["Auth"])
@@ -79,7 +80,6 @@ async def analyze_text(
         "created_at": datetime.utcnow().isoformat()
     })
     # # Get the document data
-    print('doc_ref', doc_ref)
     text_to_analyze = analyze_body.text
     document_id = doc_ref[1].id
     background_tasks.add_task(request_text_analyze, document_id, text_to_analyze, db)
@@ -124,10 +124,29 @@ async def get_user_analyze_requests(
         
         # count total items
         total_count_query = db.collection('analyze_request').where('user_id', '==', user_id).count()
-        total_count_result = await total_count_query.get()
+        
+        result = await run_functions_concurrently(
+            [
+                total_count_query.get(),
+                query.get()
+            ],
+        )
+        
+        if not result:
+            return success_response(
+                data={
+                    'requests': [],
+                    'total': 0,
+                    'limit': limit,
+                    'offset': offset
+                },
+                message="Analysis requests retrieved successfully",
+                status_code=status.HTTP_200_OK
+            )
+
+        total_count_result = list(result[0])
         total_count = total_count_result[0][0].value
-        # Execute query
-        docs = await query.get()
+        docs = list(result[1])
         
         # Convert documents to list of dictionaries
         requests = []

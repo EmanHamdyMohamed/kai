@@ -6,7 +6,7 @@ email-validator
 PyJWT
 python-dotenv
 pydantic-settings
-openai >= 1.67.0
+openai == 2.1.0
 
 # Testing dependencies
 pytest

@@ -1,7 +1,9 @@
-import openai
-import asyncio
 import json
+import logging
 from datetime import datetime
+
+import openai
+
 from app.config import Settings
 from app.models.user import RequestStatus
 
@@ -10,20 +12,17 @@ openai.api_key = Settings().OPENAI_API_KEY
 
 def validate_custom_json(data: dict, required_fields: list) -> bool:
     """Validate custom JSON format."""
-    
     # Check if it's a dict
     if not isinstance(data, dict):
         return False
     
     # Check required fields
     missing_fields = [field for field in required_fields if field not in data]
-    print('missing_fields: ', missing_fields)
     if missing_fields:
         return False
     
     # Check for empty values
     null_fields = [field for field in required_fields if not data.get(field)]
-    print('null_fields: ', null_fields)
     if null_fields:
         return False
     
@@ -33,8 +32,7 @@ def validate_custom_json(data: dict, required_fields: list) -> bool:
 async def request_text_analyze(request_id: str, text_to_analyze: str, db):
     """Background task to analyze text and update status."""
     try:
-        print(f'Starting analysis for request ID: {request_id}')
-        print(f'Text to analyze: {text_to_analyze}')
+        logging.info(f'Starting analysis for request ID: {request_id}')
         
         # Update status to processing
         doc_ref = db.collection('analyze_request').document(request_id)
@@ -42,7 +40,7 @@ async def request_text_analyze(request_id: str, text_to_analyze: str, db):
             'status': RequestStatus.processing.value,
             'updated_at': datetime.utcnow().isoformat()
         })
-        print(f'Updated status to processing for request: {request_id}')
+        logging.info(f'Updated status to processing for request: {request_id}')
         
         # Perform analysis
         response = openai.chat.completions.create(
@@ -72,8 +70,8 @@ async def request_text_analyze(request_id: str, text_to_analyze: str, db):
         )
         
         result_string = response.choices[0].message.content
-        print(f'Analysis completed for request: {request_id}')
-        print(f'Raw result: {result_string}')
+        logging.info(f'Analysis completed for request: {request_id}')
+        logging.info(f'Raw result: {result_string}')
         status = RequestStatus.completed.value
         
         # Parse JSON result
@@ -82,9 +80,9 @@ async def request_text_analyze(request_id: str, text_to_analyze: str, db):
             is_valid = validate_custom_json(result_json, ["summary", "sentiment", "keywords"])
             if not is_valid:
                 status = RequestStatus.failed.value
-            print(f'Parsed JSON result: {result_json}, is_valid: {is_valid}')
+            logging.info(f'Parsed JSON result: {result_json}, is_valid: {is_valid}')
         except json.JSONDecodeError as e:
-            print(f'Failed to parse JSON result: {e}')
+            logging.info(f'Failed to parse JSON result: {e}')
             # Fallback to string result
             result_json = {
                 "summary": "Analysis completed",
@@ -101,10 +99,10 @@ async def request_text_analyze(request_id: str, text_to_analyze: str, db):
             'updated_at': datetime.utcnow().isoformat(),
             'completed_at': datetime.utcnow().isoformat()
         })
-        print(f'Updated status to completed for request: {request_id}')
+        logging.info(f'Updated status to completed for request: {request_id}')
         
     except Exception as e:
-        print(f'Error analyzing text for request {request_id}: {e}')
+        logging.error(f'Error analyzing text for request {request_id}: {e}')
         
         # Update status to error
         try:
@@ -114,6 +112,6 @@ async def request_text_analyze(request_id: str, text_to_analyze: str, db):
                 'error_message': str(e),
                 'updated_at': datetime.utcnow().isoformat()
             })
-            print(f'Updated status to error for request: {request_id}')
+            logging.info(f'Updated status to error for request: {request_id}')
         except Exception as update_error:
-            print(f'Failed to update error status for request {request_id}: {update_error}')
+            logging.error(f'Failed to update error status for request {request_id}: {update_error}')
