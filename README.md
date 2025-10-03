@@ -128,11 +128,9 @@ cd kai
 
 #### **Primary AI Assistant: Claude**
   - **Code Generation**: Code out-complete and Implementation based on prompt description
-  - **Problem Solving**: Complex integration challenges and debugging
   - **Documentation**: README files, API documentation, and code comments
-  - **OpenAI Integration**: API wrapper functions and error handling
   - **Styling**: Tailwind CSS classes and responsive design
-  - **Troubleshooting**: Common issues and solutions and search in documentations
+  - **Troubleshooting**: Debugging and Common issues and solutions and search in documentations
   - **Frontend design**: I used lovable to provide app design and style
 
 ---
