@@ -5,6 +5,7 @@ from firebase_admin import auth
 from starlette.requests import Request
 
 from app.utils.responses import unauthorized_response, validation_error_response
+from app.utils.token_verification import verify_firebase_token
 
 
 async def authorize_token(request: Request, call_next):
@@ -28,29 +29,27 @@ async def authorize_token(request: Request, call_next):
         )
 
     try:
-        decoded_token = auth.verify_id_token(token)
-        # Add user info to request state (use request.state, not request.user)
+        # Use the new utility function for better error handling
+        decoded_token = await verify_firebase_token(token)
+        
+        if not decoded_token:
+            return unauthorized_response("Invalid or expired token")
+        
+        # Add user info to request state
         request.state.user = {
-            "user_id": decoded_token['uid'],  # Firebase uses 'uid', not 'user_id'
-            "name": decoded_token['name'],
-            "email": decoded_token['email'],
+            "user_id": decoded_token['uid'],
+            "name": decoded_token.get('name'),
+            "email": decoded_token.get('email'),
             "email_verified": decoded_token.get('email_verified', False)
         }
+        
         return await call_next(request)
         
-    except auth.InvalidIdTokenError:
-        return unauthorized_response("Invalid or expired token")
-    except auth.ExpiredIdTokenError:
-        return unauthorized_response("Token has expired")
-    except (ValueError, TypeError) as e:
-        logging.exception(e, stack_info=True)
-        return validation_error_response(
-            error=str(e),
-            message="Token validation failed"
-        )
     except Exception as e:
-        print('-----------------', e)
-        logging.exception(e, stack_info=True)
+        logging.error("Authentication failed", extra={
+            "error": str(e),
+            "path": request.url.path
+        }, exc_info=True)
         return JSONResponse(
             content={'detail': 'Authentication failed'},
             status_code=500
