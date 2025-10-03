@@ -99,17 +99,6 @@ cd kai
 - Use meaningful commit messages
 - Keep commits focused and atomic
 
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🆘 Support
-
-For support and questions:
-- Create an issue in the repository
-- Check the individual README files in backend/ and frontend/
-- Review the API documentation
-- Check the Firebase and OpenAI documentation
 
 ## ⏱️ Development Timeline & Approach
 
@@ -148,17 +137,6 @@ For support and questions:
 
 ---
 
-## 🔄 Changelog
-
-### v1.0.0
-- Initial release
-- Full-stack text analysis platform
-- Firebase authentication integration
-- OpenAI-powered analysis
-- Real-time status tracking
-- Responsive web interface
-- Comprehensive documentation
-
 ## 🙏 Acknowledgments
 
 - [FastAPI](https://fastapi.tiangolo.com/) - Modern Python web framework
@@ -166,3 +144,15 @@ For support and questions:
 - [Firebase](https://firebase.google.com/) - Backend-as-a-Service platform
 - [OpenAI](https://openai.com/) - AI text analysis capabilities
 - [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🆘 Support
+
+For support and questions:
+- Create an issue in the repository
+- Check the individual README files in backend/ and frontend/
+- Review the API documentation
+- Check the Firebase and OpenAI documentation
